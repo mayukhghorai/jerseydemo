@@ -1,0 +1,59 @@
+group 'com.howtodoinjava'
+version '1.0-SNAPSHOT'
+
+apply plugin: 'java'
+apply plugin: 'maven-publish'
+
+sourceCompatibility = 1.8
+
+task sourceJar(type: Jar) {
+    from sourceSets.main.allJava
+    classifier "sources"
+}
+
+publishing {
+    repositories {
+        maven {
+            if (project.version.endsWith('-SNAPSHOT')) {
+                url "http://nexus:8081/repository/maven-snapshots"
+            } else {
+                url "http://nexus:8081/repository/maven-releases"
+            }
+            credentials {
+                username = 'developer'
+                password = 'Mcx@123'
+            }
+        }
+    }
+
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+        }
+    }
+
+    publications {
+        mavenJava(MavenPublication) {
+            artifact sourceJar
+        }
+    }
+}
+
+repositories {
+    maven {
+        url "http://nexus:8081/repository/maven-public"
+    }
+}
+
+configurations.all {
+    // Check for updates every build
+    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+}
+
+dependencies {
+
+    compile 'org.springframework.boot:spring-boot-starter-jersey:1.2.0.RELEASE'
+    testCompile 'org.springframework.boot:spring-boot-starter-test:1.5.7.RELEASE'
+}
+
+
